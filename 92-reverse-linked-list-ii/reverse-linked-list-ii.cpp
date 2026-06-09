@@ -2,28 +2,47 @@ class Solution {
 public:
     ListNode* reverseBetween(ListNode* head, int left, int right) {
 
-        if(head == NULL || left == right) return head;
+        if (!head || left == right) return head;
 
         ListNode dummy(0);
         dummy.next = head;
 
-        ListNode* prev = &dummy;
+        // Find beforeLeft
+        ListNode* beforeLeft = &dummy;
 
-        // Move prev to node before 'left'
-        for(int i = 1; i < left; i++) {
-            prev = prev->next;
+        for (int i = 1; i < left; i++) {
+            beforeLeft = beforeLeft->next;
         }
 
-        ListNode* curr = prev->next;
+        ListNode* leftNode = beforeLeft->next;
 
-        // Reverse nodes from left to right
-        for(int i = 0; i < right - left; i++) {
+        // Find rightNode
+        ListNode* rightNode = leftNode;
+
+        for (int i = left; i < right; i++) {
+            rightNode = rightNode->next;
+        }
+
+        ListNode* afterRight = rightNode->next;
+
+        // CUT
+        beforeLeft->next = nullptr;
+        rightNode->next = nullptr;
+
+        // REVERSE NORMALLY
+        ListNode* prev = nullptr;
+        ListNode* curr = leftNode;
+
+        while (curr) {
             ListNode* next = curr->next;
-
-            curr->next = next->next;
-            next->next = prev->next;
-            prev->next = next;
+            curr->next = prev;
+            prev = curr;
+            curr = next;
         }
+
+        // RECONNECT
+        beforeLeft->next = prev;
+        leftNode->next = afterRight;
 
         return dummy.next;
     }
