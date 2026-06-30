@@ -16,37 +16,40 @@ public:
         // Count total nodes
         int count = 0;
         ListNode* temp = head;
-
         while (temp) {
             count++;
             temp = temp->next;
         }
 
-        // Dummy node
         ListNode dummy(0);
         dummy.next = head;
 
-        // groupPrev always points to the node before current group
         ListNode* groupPrev = &dummy;
 
         while (count >= k) {
 
             // First node of current group
-            ListNode* curr = groupPrev->next;
+            ListNode* groupHead = groupPrev->next;
 
-            // Node after current group
-            ListNode* next = curr->next;
+            // Reverse exactly k nodes
+            ListNode* prev = nullptr;
+            ListNode* curr = groupHead;
 
-            // Reverse k nodes
-            for (int i = 1; i < k; i++) {
-                curr->next = next->next;
-                next->next = groupPrev->next;
-                groupPrev->next = next;
-                next = curr->next;
+            for (int i = 0; i < k; i++) {
+                ListNode* next = curr->next;
+                curr->next = prev;
+                prev = curr;
+                curr = next;
             }
 
-            // Move groupPrev to the end of reversed group
-            groupPrev = curr;
+            // Connect previous part to new head
+            groupPrev->next = prev;
+
+            // Connect tail of reversed group to remaining list
+            groupHead->next = curr;
+
+            // Move groupPrev to tail of current reversed group
+            groupPrev = groupHead;
 
             count -= k;
         }
